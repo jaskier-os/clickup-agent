@@ -1,0 +1,24 @@
+{
+  "name": "clickup-agent",
+  "version": "2.0.0",
+  "description": "ClickUp MCP server + agent with task management, filtering, and workspace navigation",
+  "type": "module",
+  "scripts": {
+    "agent": "node src/agent-entry.js",
+    "mcp": "node src/mcp-server.js",
+    "dev": "npx nodemon src/agent-entry.js",
+    "dev:mcp": "npx nodemon src/mcp-server.js",
+    "test": "node --test tests/mcp-integration.test.js",
+    "test:integration": "node --test tests/mcp-integration.test.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "@orchestrator/sdk": "file:./vendor/orchestrator-sdk",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^4.18.2",
+    "kill-port": "^2.0.1",
+    "undici": "^7.0.0",
+    "ws": "^8.16.0"
+  }
+}

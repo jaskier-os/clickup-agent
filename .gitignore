@@ -1,0 +1,20 @@
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+node_modules/
+vendor/orchestrator-sdk/node_modules/
+
+# Build / cache
+dist/
+build/
+.cache/
+*.log
+coverage/
+
+# Editor / OS
+.idea/
+.vscode/
+.DS_Store
