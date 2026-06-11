@@ -1,14 +1,31 @@
 # Standalone CI for this service repo. Builds its own Dockerfile (SDK/context-mode
 # vendored in-repo) with buildx --push (build+push atomic, no local image kept),
-# then bumps the image tag in infrastructure/deploy (Flux reconciles).
+# then bumps the image tag in the deploy repo (Flux reconciles).
+#
+# Also runs two-way GitLab<->GitHub sync. GitLab is canonical and VPN-only, so sync
+# is GitLab-initiated:
+#   - push to main          -> immediate GitLab->GitHub propagation + build/deploy.
+#   - scheduled (every 10m)  -> pulls GitHub-side changes (PR merges) back ONLY;
+#                              build/deploy do NOT run on schedule.
+# Conflicts open a GitHub PR (see scripts/sync-gitlab-github.sh).
 
 variables:
   REGISTRY: localhost:5000
-  DEPLOY_REPO: ssh://git@10.29.71.1:41922/infrastructure/deploy.git
+  # DEPLOY_REPO is set as a CI/CD variable in the GitLab project settings.
 
 stages:
+  - sync
   - build
   - deploy
+
+sync-github:
+  stage: sync
+  tags: [shell]
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_COMMIT_AUTHOR != "gitlab-github-sync <sync-bot@jaskier-os>"'
+  script:
+    - bash scripts/sync-gitlab-github.sh
 
 .build-and-push:
   stage: build
@@ -50,7 +67,7 @@ build:
     DOCKERFILE: Dockerfile.agent
     BUILD_CONTEXT: "."
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"'
 
 deploy:
   extends: .deploy
@@ -58,4 +75,4 @@ deploy:
     SERVICE: clickup-agent
   needs: [build]
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"'

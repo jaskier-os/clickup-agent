@@ -1,5 +1,7 @@
 # clickup-agent
 
+> **Docs & wiki:** [github.com/jaskier-os/docs/wiki](https://github.com/jaskier-os/docs/wiki)
+
 ClickUp integration for the orchestrator, in two parts. The MCP server
 (`src/mcp-server.js`) exposes ClickUp operations -- workspaces, spaces, folders, lists,
 tasks, comments, filtering, search -- as MCP tools over HTTP. The agent
