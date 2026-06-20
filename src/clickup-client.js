@@ -37,6 +37,7 @@ export class ClickUpClient {
     if (this.dispatcher) {
       fetchOptions.dispatcher = this.dispatcher;
     }
+    fetchOptions.signal = AbortSignal.timeout(30_000);
     const response = await fetch(url, fetchOptions);
 
     if (!response.ok) {
